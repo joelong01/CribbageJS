@@ -1,0 +1,9 @@
+localhost:8080/api/scorehand/SixOfHearts,FiveOfHearts,FiveOfSpades,JackOfHearts/FourOfHearts/false
+localhost:8080/api/scorecountedcards/FiveOfClubs,FourOfHearts,TwOfDiamonds,ThreeOfSpades/AceOfSpades/14
+localhost:8080/api/scorecountedcards/FiveOfClubs,FiveOfHearts,FiveOfSpaces/FiveOfDiamonds/10
+localhost:8080/api/scorecountedcards/FiveOfClubs,FiveOfHearts/FiveOfDiamonds/10
+localhost:8080/api/scorecountedcards/FiveOfClubs,FourOfHearts,TwoOfDiamonds,ThreeOfSpades,AceOfSpades,TenOfHearts/SixOfHearts/25
+localhost:8080/api/allcards
+localhost:8080/api/scorehand/FiveOfHearts,FiveOfClubs,FiveOfSpades,JackOfDiamonds/FourOfDiamonds/false
+
+
