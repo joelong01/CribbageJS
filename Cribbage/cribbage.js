@@ -789,3 +789,18 @@ function Is3CardRun(card1, card2, card3)
 
     return false;
 }
+
+/*****************************************************/
+/*
+    APIs to select cards for callers.  
+    selectCribCards(hand, isCrib): return 2 cards from the hand that get passed to the crib
+    selectCountedCard(playedCards, uncountedCards, currentCount) gets the best card to count
+*/
+/*****************************************************/
+
+var Combinatorics = require('js-combinatorics');
+exports.selectCribCards = selectCribCards;
+function selectCribCards(hand, isCrib)
+{
+    
+}
