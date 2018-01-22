@@ -25,8 +25,8 @@ exports.Suit = Suit;
 
 //var CardNames = new Enum();
 //exports.CardNames = CardNames;
-var Cards = {};
-exports.Cards = Cards;
+var Deck = {};
+exports.Deck = Deck;
 
 function Init()
 {
@@ -39,7 +39,7 @@ function Init()
             var c = new Card(Ordinal.get(i), i, i < 10 ? i : 10, Suit.get(j));
             var name = c.toString();
             //  CardNames.push(name);
-            Cards[name] = c;
+            Deck[name] = c;
         }
     }
 }

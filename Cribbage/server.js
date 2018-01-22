@@ -26,12 +26,12 @@ router.get('/ordinals', function (req, res)
 
 router.get('/allcards', function (req, res)
 {
-  res.send(JSON.stringify(cards.Cards));
+  res.send(JSON.stringify(cards.Deck));
 });
 
 router.get('/card/:name', function (req, res)
 {
-  var card = cards.Cards[req.params.name];
+  var card = cards.Deck[req.params.name];
   res.send(JSON.stringify(card));
 });
 
@@ -44,7 +44,7 @@ router.get('/scorehand/:hand/:sharedcard/:isCrib', function (req, res, next)
  // first build up the array of cards.  these store references to our deck
   for (var i=0; i<cardNames.length; i++)
   {
-    var card = cards.Cards[cardNames[i]];
+    var card = cards.Deck[cardNames[i]];
     if (card != null)
     {
       hand.push(card);
@@ -57,7 +57,7 @@ router.get('/scorehand/:hand/:sharedcard/:isCrib', function (req, res, next)
     }    
   }
 
-  var sharedcard = cards.Cards[req.params.sharedcard];
+  var sharedcard = cards.Deck[req.params.sharedcard];
   var isCrib = JSON.parse(req.params.isCrib);
 
   
@@ -76,7 +76,7 @@ router.get('/scorecountedcards/:countedcards/:playedcard/:currentCount', functio
  // first build up the array of played cards.  these store references to our deck
   for (var i=0; i<playedCardNames.length; i++)
   {
-    var card = cards.Cards[playedCardNames[i]];
+    var card = cards.Deck[playedCardNames[i]];
     if (card != null)
     {
       countedCards.push(card);
@@ -89,7 +89,7 @@ router.get('/scorecountedcards/:countedcards/:playedcard/:currentCount', functio
     }    
   }
 
-  var playedCard = cards.Cards[req.params.playedcard];
+  var playedCard = cards.Deck[req.params.playedcard];
   var currentCount = Number(req.params.currentCount);
 
   var tempCount = 0;
