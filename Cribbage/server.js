@@ -1,7 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var cards = require('./models/card');
-var scoring = require('./cribbage');
+var cribbage = require('./cribbage');
 var app = express();
 
 app.use(bodyParser.json());
@@ -33,6 +33,38 @@ router.get('/card/:name', function (req, res)
 {
   var card = cards.Cards[req.params.name];
   res.send(JSON.stringify(card));
+});
+
+router.get('/scorehand/:hand/:sharedcard/:isCrib', function (req, res, next)
+{
+
+  var cardNames = req.params.hand.split(",");
+  var hand = [];
+ //
+ // first build up the array of cards.  these store references to our deck
+  for (var i=0; i<cardNames.length; i++)
+  {
+    var card = cards.Cards[cardNames[i]];
+    if (card != null)
+    {
+      hand.push(card);
+    }
+    else
+    {      
+      res.status(404).send("Bad Card: " + cardNames[i]);
+      return next(404);
+          
+    }    
+  }
+
+  var sharedcard = cards.Cards[req.params.sharedcard];
+  var isCrib = JSON.parse(req.params.isCrib);
+
+  
+  var standardResponse = cribbage.scoreHand(hand, sharedcard, isCrib);
+  
+  res.send(standardResponse);
+  
 });
 
 router.get('/scorecountedcards/:countedcards/:playedcard/:currentCount', function (req, res, next)
@@ -76,7 +108,7 @@ router.get('/scorecountedcards/:countedcards/:playedcard/:currentCount', functio
     return next(403);
   }
 
-  var standardResponse = scoring.scoreCountingCardsPlayed(countedCards, playedCard, currentCount);
+  var standardResponse = cribbage.scoreCountingCardsPlayed(countedCards, playedCard, currentCount);
   
   res.send(standardResponse);
   
