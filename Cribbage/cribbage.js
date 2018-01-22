@@ -3,6 +3,7 @@
     this file contains very specific cribbage 
     1. The enums used in Cribbage
     2. the scoring 
+    3. card selection
     
 */
 var Enum = require('enum');
@@ -221,7 +222,7 @@ function ScoreCountedRun(playedCards) // played cards is an array of cards that 
     }
 
     return new Score(ScoreName.CountedRun, score, cardList, null);
-    
+
 }
 //
 //  this function looks to see if we have exactly the same object in the array -- NOT the values
@@ -234,5 +235,6 @@ function arrayContainsCard(a, card)
             return true;
     }
     return false;
-      
+
 }
+
