@@ -1,13 +1,8 @@
 
 var Enum = require('enum');
 
-exports.Ordinal = Ordinal;
-exports.Suit = Suit;
-exports.Init = Init;
-exports.Card = Card;
-exports.Deck = Deck;
 
-
+var Deck = {};
 
 var Suit = new Enum(
     { 'Uninitialized': -1, 'Clubs': 0, 'Diamonds': 1, 'Hearts': 2, 'Spades': 3 }, { freeze: true });
@@ -30,7 +25,7 @@ var Ordinal = new Enum(
     }, { freez: true });
 
 
-var Deck = {};
+
 
 //
 //  created a deck for us to use
@@ -67,7 +62,14 @@ Card.prototype.toString = function ()
     return this.Ordinal.key + "Of" + this.Suit.key;
 }
 
-
-
+/*
+    Exports defined AT THE END of the module so that they are defined.
+    painful lesson to learn.
+*/
+exports.Ordinal = Ordinal;
+exports.Suit = Suit;
+exports.Init = Init;
+exports.Card = Card;
+exports.Deck = Deck;
 
 
