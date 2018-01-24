@@ -1,11 +1,22 @@
+// @ts-check
 
 var Enum = require('enum');
 
-
+//
+//  exported as a complete deck - allows the map of cardname ("AceOfSpades") to the Card
+//
 var Deck = {};
 
+
 var Suit = new Enum(
-    { 'Uninitialized': -1, 'Clubs': 0, 'Diamonds': 1, 'Hearts': 2, 'Spades': 3 }, { freeze: true });
+    {
+        'Uninitialized': -1,
+        'Clubs': 0,
+        'Diamonds': 1,
+        'Hearts': 2,
+        'Spades': 3
+    }, { freeze: true });
+
 var Ordinal = new Enum(
     {
         'Uninitialized': 0,
@@ -32,13 +43,13 @@ var Ordinal = new Enum(
 //  
 function Init()
 {
-    console.log("Card Init called");
+    console.log('Card Init called');
     for (var i = 1; i < 14; i++)
     {
 
         for (var j = 0; j < 4; j++)
         {
-            var c = new Card(Ordinal.get(i), i, i < 10 ? i : 10, Suit.get(j));
+            var c = new Card(Ordinal.get(i, 0), i, i < 10 ? i : 10, Suit.get(j, 0));
             var name = c.toString();
             Deck[name] = c;
         }
@@ -60,7 +71,7 @@ var Card = function Card(ordinal, rank, value, suit)
 Card.prototype.toString = function ()
 {
     return this.Ordinal.key + "Of" + this.Suit.key;
-}
+};
 
 /*
     Exports defined AT THE END of the module so that they are defined.
