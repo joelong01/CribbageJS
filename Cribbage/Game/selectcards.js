@@ -1,4 +1,4 @@
-
+// @ts-check
 
 /*****************************************************/
 /*
@@ -23,7 +23,7 @@ function selectCribCards(hand, isMyCrib)
     potentialHands = Combinatorics.combination(hand, 4);
     var maxCrib = [];
     var maxScore = -1000.0;
-
+ 
     //
     //  go through each of the 16 combinations looking for the hand
     //  that will perform best based on the value of the hand plus
@@ -37,22 +37,23 @@ function selectCribCards(hand, isMyCrib)
         var expectedValue = 0.0;
         if (isMyCrib) //add the points to me because it is my crib
         {
-            expectedValue = CardScoring.getCardValueToMyCrib(crib[0].Rank, crib[1].Rank);
+            expectedValue = CardScoring.getCardValueToMyCrib(crib[0].Rank - 1, crib[1].Rank - 1);
             score = score + expectedValue;
         }
         else // subtract from my score because the other guy gets the points
         {
-            expectedValue = CardScoring.getCardValueToYourCrib(crib[0].Rank, crib[1].Rank);
+            expectedValue = CardScoring.getCardValueToYourCrib(crib[0].Rank - 1, crib[1].Rank - 1);            
             score = score - expectedValue;
+            
         }
 
         if (score > maxScore)
         {
+            
             maxScore = score;
             maxCrib = crib;
         }
-    };
-
+    }
     return maxCrib;
 }
 /*
@@ -93,7 +94,7 @@ function selectCountedCard(countedCards, cardsLeft, currentCount)
     {
         if (cardsLeft[0].Value + currentCount <= 31)
         {
-           return cardsLeft[0];
+            return cardsLeft[0];
         }
         else
         {
@@ -110,7 +111,7 @@ function selectCountedCard(countedCards, cardsLeft, currentCount)
     for (var i = 0; i < cardsLeft.length; i++)    
     {
         var card = cardsLeft[i];
-        score = CardScoring.scoreCountingCardsPlayed(countedCards, card, currentCount).Score; // scoreCountingCardsPlayed returns a StandardScoringResponse
+        score = CardScoring.scoreCountingCardsPlayed(countedCards, card, currentCount).Score; // scoreCountingCardsPlayed returns a StandardResponse
         if (score > maxScore)
         {
             maxScore = score;
@@ -129,7 +130,7 @@ function selectCountedCard(countedCards, cardsLeft, currentCount)
         //  play a card that we have a pair so we can get 3 of a kind - as long as it isn't a 5 and the 3 of a kind makes > 31
         //
 
-        for (var i = 0; i < cardsLeft.length - 1; i++)
+        for (let i = 0; i < cardsLeft.length - 1; i++)
         {
             //  dont' do it if it will force us over 31
             if (cardsLeft[i].Value * 3 + currentCount > 31) // *3 because I'll play it, then you'll play it, then I'll play the third for 3 of a kind
@@ -149,7 +150,7 @@ function selectCountedCard(countedCards, cardsLeft, currentCount)
         //
         //  try to play a card that will create a run
 
-        var combinations = new Combinatorics.combination(cardsLeft, 2); // at most 6 of these: 4 choose 2
+        var combinations =  Combinatorics.combination(cardsLeft, 2); // at most 6 of these: 4 choose 2
         for (var index = 0; index < combinations.length; index++)
         {
             var cards = combinations.next();
@@ -204,11 +205,10 @@ function selectCountedCard(countedCards, cardsLeft, currentCount)
         //
         //  make the right choice if assuming they'll play a 10
         //
-        var combinations = new Combinatorics.combination(cardsLeft, 2); // at most 6 of these: 4 choose 2
-        for (var index = 0; index < combinations.length; index++)
+        combinations = Combinatorics.combination(cardsLeft, 2); // at most 6 of these: 4 choose 2
+        for (let index = 0; index < combinations.length; index++)
         {
-            var cards = combinations.next();
-
+            let cards = combinations.next();
             var sum = cards[0].Value + cards[1].Value;
             if (sum + currentCount == 5) // i'll 15 them if they play a 10
             {
@@ -224,9 +224,8 @@ function selectCountedCard(countedCards, cardsLeft, currentCount)
 
     if (maxCard.Value == 5)
     {
-        for (var i=0; i<cardsLeft.length; i++)        
-        {
-            var card = cardsLeft[i];
+        for (let card of cardsLeft)    
+        {            
             if (card.Value != 5 && card.Value + currentCount <= 31)
             {
                 maxCard = card;

@@ -1,3 +1,5 @@
+// @ts-check
+
 //
 //  this function looks to see if we have exactly the same object in the array -- NOT the values
 function arrayContainsCard(a, card)

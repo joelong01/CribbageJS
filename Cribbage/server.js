@@ -1,3 +1,4 @@
+// @ts-check
 var express = require('express');
 var bodyParser = require('body-parser');
 var app = express();
@@ -17,65 +18,79 @@ var router = express.Router();
 
 router.get('/suits', function (req, res)
 {
-  res.send(cards.Suit.toJSON());
+    res.send(cards.Suit.toJSON());
 });
 
 router.get('/ordinals', function (req, res)
 {
-  res.send(cards.Ordinal.toJSON());
+    res.send(cards.Ordinal.toJSON());
 
 });
 
 router.get('/allcards', function (req, res)
 {
-  res.send(JSON.stringify(cards.Deck));
+    res.send(JSON.stringify(cards.Deck));
 });
 
 router.get('/card/:name', function (req, res)
 {
-  var card = cards.Deck[req.params.name];
-  res.send(JSON.stringify(card));
+    var card = cards.Deck[req.params.name];
+    res.send(JSON.stringify(card));
 });
-
+//
+//  score the hand (or crib)
+//
+//  sample URLs:
+//              localhost:8080/api/scorehand/FiveOfHearts,FiveOfClubs,FiveOfSpades,JackOfDiamonds/FourOfDiamonds/false
+//              localhost:8080/api/scorehand/FiveOfHearts,SixOfHearts,SevenOfHearts,EightOfHearts/NineOfDiamonds/false  (should be a flush)
+//              localhost:8080/api/scorehand/FiveOfHearts,SixOfHearts,SevenOfHearts,EightOfHearts/NineOfDiamonds/true   (no flush - need 5 of same suit in crib)
+//              localhost:8080/api/scorehand/FiveOfHearts,SixOfHearts,SevenOfHearts,EightOfHearts/NineOfHearts/true     (should be a flush)
+//              localhost:8080/api/scorehand/FiveOfHearts,SixOfHearts,FourOfHearts,FourOFClubs/SixOfDiamonds/true     (bad card)
+//              localhost:8080/api/scorehand/FiveOfHearts,SixOfHearts,FourOfHearts,FourOfClubs/SixOfDiamonds/true     (double double run with 15s - 24 points)
+//
 router.get('/scorehand/:hand/:sharedcard/:isCrib', function (req, res, next)
 {
-
-  var hand = parseCards(req.params.hand, res, next);
-  if (hand == null)
-  {
-    return next(404);
-  }
-  if (hand.length != 4)
-  {
-    res.status(404).send(hand.length + " is not the right number of cards.  expect 4");
-    return next(404);
-  }
-
-  var sharedcard = cards.Deck[req.params.sharedcard];
-  var isCrib = JSON.parse(req.params.isCrib);
-
-
-  var standardResponse = scoring.scoreHand(hand, sharedcard, isCrib);
-
-  res.send(standardResponse);
-
+    var hand = parseCards(req.params.hand, res);
+    if (hand == null)
+    {
+        return next(404);
+    }
+    if (hand.length != 4)
+    {
+        res.status(404).send(hand.length + ' is not the right number of cards.  expect 4');
+        return next(404);
+    }
+    var sharedcard = cards.Deck[req.params.sharedcard];
+    var isCrib = JSON.parse(req.params.isCrib);
+    var standardResponse = scoring.scoreHand(hand, sharedcard, isCrib);
+    res.send(standardResponse);
 });
 
+//
+//  given 6 cards, return 2.  if isMyCrib is true, then optimize to make the hand + crib as big as possible
+//
+//  sample URLs:
+//                  localhost:8080/api/getcribcards/FiveOfHearts,FiveOfClubs,FiveOfSpades,JackOfDiamonds,SixOfClubs,FourOfDiamonds/false  
+//                  localhost:8080/api/getcribcards/FiveOfHearts,FiveOfClubs,FiveOfSpades,JackOfDiamonds,SixOfClubs,FourOfDiamonds/true   
+//                  localhost:8080/api/getcribcards/FourOfHearts,FiveOfHearts,SixOfSpades,JackOfHearts,QueenOfHearts,SixOfDiamonds/true  
+//                  localhost:8080/api/getcribcards/FourOfHearts,FiveOfHearts,SixOfSpades,JackOfHearts,QueenOfHearts,SixOfDiamonds/false  
+//
+//   
 router.get('/getcribcards/:hand/:isMyCrib', function (req, res, next)
 {
-  var hand = parseCards(req.params.hand, res, next);
-  if (hand == null)
-  {
-    return next(404);
-  }
-  if (hand.length != 6)
-  {
-    res.status(404).send(hand.length + " is not the right number of cards.  expect 6");
-    return next(404);
-  }
-  var isMyCrib = JSON.parse(req.params.isMyCrib);
-  var crib = SelectCards.selectCribCards(hand, isMyCrib);
-  res.send(crib);
+    var hand = parseCards(req.params.hand, res);
+    if (hand == null)
+    {
+        return next(404);
+    }
+    if (hand.length != 6)
+    {
+        res.status(404).send(hand.length + ' is not the right number of cards.  expect 6');
+        return next(404);
+    }
+    var isMyCrib = JSON.parse(req.params.isMyCrib);
+    var crib = SelectCards.selectCribCards(hand, isMyCrib);
+    res.send(crib);
 
 });
 //
@@ -84,122 +99,145 @@ router.get('/getcribcards/:hand/:isMyCrib', function (req, res, next)
 //  if any of the names canpt be parsed return a 404 to the caller
 //  with the name of the bad token
 //
-function parseCards(handAsString, res, next)
+function parseCards(handAsString, res)
 {
-  var cardNames = handAsString.split(",");
-  var hand = [];
-  //
-  // first build up the array of cards.  these store references to our deck
-  for (var i = 0; i < cardNames.length; i++)
-  {
-    var card = cards.Deck[cardNames[i].trim()];
-    if (card != null)
+    var cardNames = handAsString.split(',');
+    var hand = [];
+    //
+    // first build up the array of cards.  these store references to our deck
+    for (var i = 0; i < cardNames.length; i++)
     {
-      hand.push(card);
+        var card = cards.Deck[cardNames[i].trim()];
+        if (card != null)
+        {
+            hand.push(card);
+        }
+        else
+        {
+            res.status(404).send('Bad Card: ' + cardNames[i]);
+            return null;
+        }
     }
-    else
-    {
-      res.status(404).send("Bad Card: " + cardNames[i]);
-      return null;
-    }
-  }
 
-  return hand;
+    return hand;
 }
 //
-//  URL examples:
-//                 localhost:8080/api/getnextcountedcard/counted:/AceOfSpades,AceOfHearts,TwoOfClubs,TenOfDiamonds/0
-//                 localhost:8080/api/getnextcountedcard/counted:AceOfSpades,ThreeOfClubs/AceOfHearts,TwoOfClubs,TenOfDiamonds/4
-//                 localhost:8080/api/getnextcountedcard/counted:AceOfSpades,ThreeOfClubs,TwoOfClubs,TenOfHearts/TenOfClubs,AceOfHearts/16
-//                 localhost:8080/api/getnextcountedcard/counted:AceOfSpades,ThreeOfClubs,TwoOfClubs,TenOfHearts,TenOfClubs,ThreeOfDiamonds/AceOfHearts/29
+//  URL example:
+//                 localhost:8080/api/getnextcountedcard/AceOfSpades,AceOfHearts,TwoOfClubs,TenOfDiamonds/0
 //
-//  this "counted:" business is so that I can pass an empty list.
-//  
-//  i trim spaces, but Cards must be spelled correctly
+//  Note that the last parameters contains all the cards that have already been counted, which means it starts empty, so there are two routes.
+//  I trim spaces, but Cards must be spelled correctly
 //      
-router.get('/getnextcountedcard/:countedcards/:cardsleft/:currentCount', function (req, res, next)
+router.get('/getnextcountedcard/:cardsleft/:currentCount', function (req, res, next)
 {
-  var inputCardsAsCsv = req.params.countedcards.split(":")[1];
-  var countedCards = [];
-  if (inputCardsAsCsv != "")
-  {
-    //
-    // first build up the array of played cards.  these store references to our deck
-    countedCards = parseCards(inputCardsAsCsv, res, next);
+    var countedCards = [];
+    if (req.param.length != 2)
+    {
+        res.status(404).send('Bad URL: too many parameters' + req.params.length);
+        next(404);
+    }
+    var cardsLeft = parseCards(req.params.cardsleft);
     if (res.statusCode != 200)
     {
-      return next(res.statusCode);
+        return next(res.statusCode);
     }
-  }
+    var currentCount = Number(req.params.currentCount);
+    var ret = SelectCards.selectCountedCard(countedCards, cardsLeft, currentCount);
+    res.send(ret);
+});
+//
+//  URL examples:
+//                 localhost:8080/api/getnextcountedcard/AceOfSpades,ThreeOfClubs/4/AceOfHearts,TwoOfClubs,TenOfDiamonds
+//                 localhost:8080/api/getnextcountedcard/TenOfClubs,AceOfHearts/16/AceOfSpades,ThreeOfClubs,TwoOfClubs,TenOfHearts
+//                 localhost:8080/api/getnextcountedcard/AceOfHearts/29/AceOfSpades,ThreeOfClubs,TwoOfClubs,TenOfHearts,TenOfClubs,ThreeOfDiamonds
+//
+//  Note that the last parameters contains all the cards that have already been counted, which means it starts empty, so there are two routes.
+//  I trim spaces, but Cards must be spelled correctly
+// 
+router.get('/getnextcountedcard/:cardsleft/:currentCount/:countedcards', function (req, res, next)
+{
 
-  //
-  //  note that counted cards will be null the first time 
+    var countedCards = [];
+    //
+    // first build up the array of played cards.  these store references to our deck
+    countedCards = parseCards(req.params.countedcards, res);
+    if (res.statusCode != 200)
+    {
+        return next(res.statusCode);
+    }
 
-  var cardsLeft = parseCards(req.params.cardsleft)
-  if (res.statusCode != 200)
-  {
-    return next(res.statusCode);
-  }
-  var currentCount = Number(req.params.currentCount);
-  var ret = SelectCards.selectCountedCard(countedCards, cardsLeft, currentCount);
-  res.send(ret);
+    var cardsLeft = parseCards(req.params.cardsleft);
+    if (res.statusCode != 200)
+    {
+        return next(res.statusCode);
+    }
+    var currentCount = Number(req.params.currentCount);
+    var ret = SelectCards.selectCountedCard(countedCards, cardsLeft, currentCount);
+    res.send(ret);
 
 });
 
 //
-//  URL examples:
-//                 localhost:8080/api/scorecountedcards/counted:/AceOfSpades/0
-//                 localhost:8080/api/scorecountedcards/counted:AceOfHearts/AceOfSpades/1
-//                 localhost:8080/api/scorecountedcards/counted:AceOfHearts,AceOfSpades/AceOfClubs/2
-//  this "counted:" business is so that I can pass an empty list.
-//      
-router.get('/scorecountedcards/:countedcards/:playedcard/:currentCount', function (req, res, next)
+//  URL example:
+//                 localhost:8080/api/scorecountedcards/AceOfSpades/0
+//                   
+router.get('/scorecountedcards/:playedcard/:currentCount', function (req, res, next)
 {
-  var inputCardsAsCsv = req.params.countedcards.split(":")[1];
-  var countedCards = [];
-  if (inputCardsAsCsv != "")
-  {
     //
-    // first build up the array of played cards.  these store references to our deck
-    countedCards = parseCards(inputCardsAsCsv, res, next);
-  }
+    //  if there are no counted cards, there can be no score. this is here for completeness
+    //  and is called only when the first card is played.  this can easily be optimized away
+    res.send(scoring.NoScoreResponse());
+});
 
-  //
-  //  note that counted cards will be null the first time 
+//
+//  URL examples:
+//                 localhost:8080/api/scorecountedcards/AceOfHearts/1/AceOfSpades
+//                 localhost:8080/api/scorecountedcards/AceOfClubs/2/AceOfHearts,AceOfSpades
+//
+//  Note: this is a GET for /scorecountedcards just like above, it just has one more parameter 
+//
+router.get('/scorecountedcards/:playedcard/:currentCount/:countedcards/', function (req, res, next)
+{
 
-  var playedCard = cards.Deck[req.params.playedcard];
-  if (res.statusCode != 200)
-  {
-    return next(res.statusCode);
-  }
-  var currentCount = Number(req.params.currentCount);
-
-  var tempCount = 0;
-  for (var i = 0; i < countedCards.length; i++)
-  {
-    tempCount += countedCards[i].Value;
-    if (tempCount > 31)
+    var countedCards = [];
+    countedCards = parseCards(req.params.countedcards, res);
+    if (res.statusCode != 200)
     {
-      tempCount = cardTokens[i].Value;
+        return next(res.statusCode);
     }
-  }
+    var playedCard = cards.Deck[req.params.playedcard];
+    if (res.statusCode != 200)
+    {
+        return next(res.statusCode);
+    }
+    var currentCount = Number(req.params.currentCount);
 
-  if (tempCount != currentCount)
-  {
-    res.status(403).send("Count should be: " + tempCount + " not " + currentCount);
-    return next(403);
-  }
+    var tempCount = 0;
+    for (var i = 0; i < countedCards.length; i++)
+    {
+        tempCount += countedCards[i].Value;
+        if (tempCount > 31)
+        {
+            tempCount = countedCards[i].Value;
+        }
+    }
 
-  var standardResponse = scoring.scoreCountingCardsPlayed(countedCards, playedCard, currentCount);
+    if (tempCount != currentCount)
+    {
+        res.status(403).send('Count should be: ' + tempCount + ' not ' + currentCount);
+        return next(403);
+    }
 
-  res.send(standardResponse);
+    var standardResponse = scoring.scoreCountingCardsPlayed(countedCards, playedCard, currentCount);
+
+    res.send(standardResponse);
 
 });
 
 
 app.use('/api', router);
 app.listen(port);
-console.log("Listening on port..." + port);
+console.log('Listening on port...' + port);
 cards.Init();
 
 
