@@ -23,7 +23,7 @@ function selectCribCards(hand, isMyCrib)
     potentialHands = Combinatorics.combination(hand, 4);
     var maxCrib = [];
     var maxScore = -1000.0;
-
+ 
     //
     //  go through each of the 16 combinations looking for the hand
     //  that will perform best based on the value of the hand plus
@@ -37,22 +37,23 @@ function selectCribCards(hand, isMyCrib)
         var expectedValue = 0.0;
         if (isMyCrib) //add the points to me because it is my crib
         {
-            expectedValue = CardScoring.getCardValueToMyCrib(crib[0].Rank, crib[1].Rank);
+            expectedValue = CardScoring.getCardValueToMyCrib(crib[0].Rank - 1, crib[1].Rank - 1);
             score = score + expectedValue;
         }
         else // subtract from my score because the other guy gets the points
         {
-            expectedValue = CardScoring.getCardValueToYourCrib(crib[0].Rank, crib[1].Rank);
+            expectedValue = CardScoring.getCardValueToYourCrib(crib[0].Rank - 1, crib[1].Rank - 1);            
             score = score - expectedValue;
+            
         }
 
         if (score > maxScore)
         {
+            
             maxScore = score;
             maxCrib = crib;
         }
     }
-
     return maxCrib;
 }
 /*
@@ -110,7 +111,7 @@ function selectCountedCard(countedCards, cardsLeft, currentCount)
     for (var i = 0; i < cardsLeft.length; i++)    
     {
         var card = cardsLeft[i];
-        score = CardScoring.scoreCountingCardsPlayed(countedCards, card, currentCount).Score; // scoreCountingCardsPlayed returns a StandardScoringResponse
+        score = CardScoring.scoreCountingCardsPlayed(countedCards, card, currentCount).Score; // scoreCountingCardsPlayed returns a StandardResponse
         if (score > maxScore)
         {
             maxScore = score;
