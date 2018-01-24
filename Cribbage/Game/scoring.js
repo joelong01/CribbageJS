@@ -1,36 +1,27 @@
-/*
+// @ts-check
 
-    this file contains very specific cribbage 
-    1. The enums used in Cribbage
-    2. the scoring 
-    
-*/
 var Enum = require('enum');
-var cards = require('./card');
 var Helpers = require('./globalhelpers');
 
 //
 // all the different ways you can score in cribbage
 var ScoreName = new Enum(
     {
-        'Fifteen': 0,
-        'Run': 1,
-        'Pair': 2,
-        'ThreeOfaKind': 3,
-        'FourOfAKind': 4,
-        'HisNibs': 5,
-        'HisNobs': 6,
-        'CountedRun': 7,
-        'ThirtyOne': 8,
-        'Go': 9,
-        'Flush': 10,
-        'LastCard': 11
-    }, { freez: true });
+    'Fifteen': 0,
+    'Run': 1,
+    'Pair': 2,
+    'ThreeOfaKind': 3,
+    'FourOfAKind': 4,
+    'HisNibs': 5,
+    'HisNobs': 6,
+    'CountedRun': 7,
+    'ThirtyOne': 8,
+    'Go': 9,
+    'Flush': 10,
+    'LastCard': 11
+}, { freez: true });
 
 exports.ScoreName = ScoreName;
-
-
-
 //
 //  we'll have a Array of scores we return to the client, each with why the score (name) and the value (score)
 var Score = function Score(name, score, playedCards, card)
@@ -83,18 +74,18 @@ function scoreCountingCardsPlayed(countedCards, card, currentCount)
 
     var scoreObjs = [];
 
-    if (!Array.isArray(countedCards) && countedCard != null) return "";
+    if (!Array.isArray(countedCards) && countedCards != null) return null;
 
     currentCount += card.Value;
     if (currentCount == 15)
     {
-        var score = new Score(ScoreName.Fifteen, 2, countedCards, card);
+        let score = new Score(ScoreName.Fifteen, 2, countedCards, card);
         scoreObjs.push(score);
         localScore += 2;
     }
     if (currentCount == 31)
     {
-        var score = new Score(ScoreName.ThirtyOne, 2, countedCards, card);
+        let score = new Score(ScoreName.ThirtyOne, 2, countedCards, card);
         scoreObjs.push(score);
         localScore += 2;
     }
@@ -126,24 +117,24 @@ function scoreCountingCardsPlayed(countedCards, card, currentCount)
     }
 
     switch (samenessCount)
-    {
-        case 1: // pair            
-            localScore += 2;
-            var score = new Score(ScoreName.Pair, 2, tempList, null);
-            scoreObjs.push(score);
-            break;
-        case 2: // 3 of a kind
-            var score = new Score(ScoreName.ThreeOfaKind, 6, tempList, null);
-            scoreObjs.push(score);
-            localScore += 6;
-            break;
-        case 3: // 4 of a kind
-            var score = new Score(ScoreName.FourOfAKind, 12, tempList, null);
-            scoreObjs.push(score);
-            localScore += 12;
-            break;
-        default:
-            break;
+    {        
+    case 1: // pair            
+        localScore += 2;
+        score = new Score(ScoreName.Pair, 2, tempList, null);
+        scoreObjs.push(score);
+        break;
+    case 2: // 3 of a kind
+        score = new Score(ScoreName.ThreeOfaKind, 6, tempList, null);
+        scoreObjs.push(score);
+        localScore += 6;
+        break;
+    case 3: // 4 of a kind
+        score = new Score(ScoreName.FourOfAKind, 12, tempList, null);
+        scoreObjs.push(score);
+        localScore += 12;
+        break;
+    default:
+        break;
     }
 
     var score = ScoreCountedRun(allCards);
@@ -162,22 +153,18 @@ function scoreCountingCardsPlayed(countedCards, card, currentCount)
 function ScoreCountedRun(playedCards) // played cards is an array of cards that have been played.  
 {
     if (!Array.isArray(playedCards)) return null;
-
     var n = 3;
     var count = playedCards.length;
     var score = 0;
-
     if (count <= 2) return null;
-
-    var cards = [];
-    var retList = [];
+    var cards = [];    
     var longestRun = 0;
     do
     {
         cards = [];
         //
         //  add the last n cards ... starting with 3
-        var i = 0;
+        let i = 0;
         for (i = 0; i < n; i++)
         {
             cards.push(playedCards[count - i - 1]);
@@ -214,7 +201,7 @@ function ScoreCountedRun(playedCards) // played cards is an array of cards that 
     }
 
     var cardList = [];
-    for (var i = 0; i < score; i++)
+    for (let i = 0; i < score; i++)
     {
         cardList.push(playedCards[count - i - 1]);
     }
@@ -251,6 +238,7 @@ function getCardValueToMyCrib(rank1, rank2)
     dropTable.push(sixDrop);
     dropTable.push(sevenDrop);
     dropTable.push(eightDrop);
+    dropTable.push(nineDrop);
     dropTable.push(tenDrop);
     dropTable.push(jackDrop);
     dropTable.push(queenDrop);
@@ -286,6 +274,7 @@ function getCardValueToYourCrib(rank1, rank2)
     dropTable.push(sixDrop);
     dropTable.push(sevenDrop);
     dropTable.push(eightDrop);
+    dropTable.push(nineDrop);
     dropTable.push(tenDrop);
     dropTable.push(jackDrop);
     dropTable.push(queenDrop);
@@ -303,7 +292,7 @@ exports.scoreHand = scoreHand;
 function scoreHand(hand, sharedCard, isCrib)
 {
     var localScore = 0;
-    scoreList = [];
+    var scoreList = [];
     var score = scoreNibs(hand, sharedCard); // this is the only one where it matters which particular card is shared
     if (score != null)
     {
@@ -398,10 +387,10 @@ function scoreFlush(hand, isCrib)
     }
 
     var flushCards = [];
-    for (var i = 0; i < max; i++)
+    for (let i = 0; i < max; i++)
     {
         flushCards.push(hand[i]);
-    };
+    }
     var score = new Score(ScoreName.Flush, max, flushCards);
     var scoreList = [];
     scoreList.push(score);
@@ -431,7 +420,7 @@ function scoreRuns(hand)
         if (runs[0].length == runs[1].length) // same length
         {
             var same = false;
-            for (var i = 0; i < runs[0].length; i++)
+            for (let i = 0; i < runs[0].length; i++)
             {
                 if (runs[0][i] != runs[1][i])
                 {
@@ -444,7 +433,7 @@ function scoreRuns(hand)
 
             if (same)
             {
-                runs.pop(1);
+                runs.pop();
             }
         }
     }
@@ -455,12 +444,12 @@ function scoreRuns(hand)
     var localScore = 0;
     var scoreList = [];
     var len = runs.length;
-    for (var i = 0; i < len; i++)
+    for (let i = 0; i < len; i++)
     {
-        var cards = runs[i];
+        let cards = runs[i];
         if (cards.length > 2)
         {
-            var score = new Score(ScoreName.Run, cards.length, cards, null);
+            let score = new Score(ScoreName.Run, cards.length, cards, null);
             scoreList.push(score);
             localScore += cards.length;
 
@@ -565,27 +554,26 @@ function scorePairs(hand)
 
     var score = 0;
     var scoreList = [];
-    for (var i = 0; i < retList.length; i++)    
+    for (let i = 0; i < retList.length; i++)    
     {
         var lst = retList[i];
         if (lst.length == 0) continue;
         switch (lst.length)
         {
-            case 4:
-                scoreList.push(new Score(ScoreName.FourOfAKind, 12, lst, null));
-                score += 12;
-                break;
-            case 3:
-                scoreList.push(new Score(ScoreName.ThreeOfaKind, 6, lst, null));
-                score += 6;
-                break;
-            case 2:
-                scoreList.push(new Score(ScoreName.Pair, 2, lst, null));
-                score += 2;
-                break;
-            default:
-                Console.console.log("You have a bug in your ScorePairs function!");
-                break;
+        case 4:
+            scoreList.push(new Score(ScoreName.FourOfAKind, 12, lst, null));
+            score += 12;
+            break;
+        case 3:
+            scoreList.push(new Score(ScoreName.ThreeOfaKind, 6, lst, null));
+            score += 6;
+            break;
+        case 2:
+            scoreList.push(new Score(ScoreName.Pair, 2, lst, null));
+            score += 2;
+            break;
+        default:
+            console.log("Bug in score pairs!");
         }
     }
 
@@ -595,8 +583,7 @@ function scorePairs(hand)
 
 function scoreNibs(hand, sharedCard)
 {
-
-    var scoreList = [];
+    
     if (sharedCard != null)
     {
         for (var i = 0; i < 4; i++)
@@ -610,7 +597,6 @@ function scoreNibs(hand, sharedCard)
                             hand[i], sharedCard
                         ];
                     var score = new Score(ScoreName.HisNibs, 1, scoringCards, null);
-
                     return score;
 
                 }
@@ -638,18 +624,18 @@ function scoreFifteens(cards)
             if (ijVal == 15)
             {
                 localScore += 2;
-                var scoringCards =
+                let scoringCards =
                     [
                         cards[i], cards[j]
                     ];
-                var score = new Score(ScoreName.Fifteen, 2, scoringCards, null);
+                let score = new Score(ScoreName.Fifteen, 2, scoringCards, null);
                 scoreList.push(score);
             }
             else
             {
-                for (var k = j + 1; k < cards.length; k++)
+                for (let k = j + 1; k < cards.length; k++)
                 {
-                    var ijkVal = cards[k].Value + ijVal;
+                    let ijkVal = cards[k].Value + ijVal;
                     if (ijkVal > 15)
                     {
                         break;
@@ -657,21 +643,21 @@ function scoreFifteens(cards)
 
                     if (ijkVal == 15)
                     {
-                        var scoringCards =
+                        let scoringCards =
                             [
                                 cards[i],
                                 cards[j],
                                 cards[k]
                             ];
-                        var score = new Score(ScoreName.Fifteen, 2, scoringCards, null);
+                        let score = new Score(ScoreName.Fifteen, 2, scoringCards, null);
                         scoreList.push(score);
                         localScore += 2;
                     }
                     else
                     {
-                        for (var x = k + 1; x < cards.length; x++)
+                        for (let x = k + 1; x < cards.length; x++)
                         {
-                            var ijkxVal = cards[x].Value + ijkVal;
+                            let ijkxVal = cards[x].Value + ijkVal;
                             if (ijkxVal > 15)
                             {
                                 break;
@@ -679,32 +665,32 @@ function scoreFifteens(cards)
 
                             if (ijkxVal == 15)
                             {
-                                var scoringCards =
+                                let scoringCards =
                                     [
                                         cards[i],
                                         cards[j],
                                         cards[k],
                                         cards[x]
                                     ];
-                                var score = new Score(ScoreName.Fifteen, 2, scoringCards, null);
+                                let score = new Score(ScoreName.Fifteen, 2, scoringCards, null);
                                 scoreList.push(score);
                                 localScore += 2;
                             }
 
                             if (cards.length != 5) continue;
 
-                            var sumAll = ijkVal + cards[3].Value + cards[4].Value;
+                            let sumAll = ijkVal + cards[3].Value + cards[4].Value;
                             if (sumAll == 15) // takes all 5...
                             {
 
-                                var score = new Score(ScoreName.Fifteen, 2, cards, null);
+                                let score = new Score(ScoreName.Fifteen, 2, cards, null);
                                 scoreList.push(score);
                                 localScore += 2;
                             }
 
                             if (sumAll < 15) // not enough points to get to 15 with all 5 cards
                             {
-                                return (0, null);
+                                break;
                             }
                         }
                     }
@@ -733,20 +719,20 @@ function DemuxPairs(list)
     var previousCard = null;
     var consecutive = 0;
     var pairs = 0;
-    for (var i = 0; i < list.length; i++)
+    for (let i = 0; i < list.length; i++)
     {
         var thisCard = list[i];
 
         if (previousCard == null)
         {
-            templist = [];
+            let templist = [];
             templist.push(thisCard);
             cardList.push(templist);
         }
         else if (previousCard.Rank != thisCard.Rank) // not a pair, add to all of the lists we are maintaining
         {
             consecutive = 0;
-            for (var j = 0; j < cardList.length; j++)
+            for (let j = 0; j < cardList.length; j++)
             {
                 cardList[j].push(thisCard);
             }
@@ -758,17 +744,17 @@ function DemuxPairs(list)
 
             if (consecutive == 1 && pairs == 1 || consecutive == 2 && pairs == 2)
             {
-                var count = cardList.length;
-                var newList = cardList[count - 1].slice(0);
+                let count = cardList.length;
+                let newList = cardList[count - 1].slice(0);
                 cardList.push(newList);
                 newList.pop(previousCard);
                 newList.push(thisCard);
             }
             else if (consecutive == 1 && pairs == 2)
             {
-                for (var k = 0; k < 2; k++)
+                for (let k = 0; k < 2; k++)
                 {
-                    var newList = cardList[k].slice(0);
+                    let newList = cardList[k].slice(0);
                     newList.pop(previousCard);
                     newList.push(thisCard);
                     cardList.push(newList);
