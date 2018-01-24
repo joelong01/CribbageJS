@@ -1,4 +1,3 @@
-// @ts-check
 
 var Enum = require('enum');
 var Helpers = require('./globalhelpers');
@@ -7,27 +6,28 @@ var Helpers = require('./globalhelpers');
 // all the different ways you can score in cribbage
 var ScoreName = new Enum(
     {
-    'Fifteen': 0,
-    'Run': 1,
-    'Pair': 2,
-    'ThreeOfaKind': 3,
-    'FourOfAKind': 4,
-    'HisNibs': 5,
-    'HisNobs': 6,
-    'CountedRun': 7,
-    'ThirtyOne': 8,
-    'Go': 9,
-    'Flush': 10,
-    'LastCard': 11
+    "Fifteen": 0,
+    "Run": 1,
+    "Pair": 2,
+    "ThreeOfaKind": 3,
+    "FourOfAKind": 4,
+    "HisNibs": 5,
+    "HisNobs": 6,
+    "CountedRun": 7,
+    "ThirtyOne": 8,
+    "Go": 9,
+    "Flush": 10,
+    "LastCard": 11,
+    "None" : 12
 }, { freez: true });
 
-exports.ScoreName = ScoreName;
 //
 //  we'll have a Array of scores we return to the client, each with why the score (name) and the value (score)
 var Score = function Score(name, score, playedCards, card)
-{
+{   
     this.ScoreName = name;
     this.Score = score;
+          
     this.Cards = [];
     if (playedCards.constructor === Array)
     {
@@ -42,24 +42,26 @@ var Score = function Score(name, score, playedCards, card)
         this.Cards.push(card);
     }
 };
-exports.Score = Score;
+
 
 //
 //  the object I will return from (most?  all?) REST API calls
 //
-//  Score:  the new socre (sometimes set to NaN if the api doesn't modify it)
+//  Score:  the new score (sometimes set to NaN if the api doesn't modify it)
 //  Cards:  the list of cards relevent for the call (sometimes empty)
 //  
-var StandardScoringResponse = function StandardResponse(score, scoreInfoList)
+function StandardResponse(score, scoreInfoList)
 {
     this.Score = score;
     this.ScoreInfo = scoreInfoList.slice(0);
 
 };
 
-exports.StandardResponse = StandardScoringResponse;
-
-
+function NoScoreResponse()
+{
+    var score = new Score(ScoreName.None, 0, [], null);
+    return new StandardResponse(0, [] = [score]);
+}
 
 
 //
@@ -67,7 +69,7 @@ exports.StandardResponse = StandardScoringResponse;
 //  card: the card just played
 //  currentCount: the sum of the values of countedCards
 //
-exports.scoreCountingCardsPlayed = scoreCountingCardsPlayed;
+
 function scoreCountingCardsPlayed(countedCards, card, currentCount)
 {
     var localScore = 0;
@@ -146,7 +148,7 @@ function scoreCountingCardsPlayed(countedCards, card, currentCount)
             scoreObjs.push(score);
         }
     }
-    var standardResponse = new StandardScoringResponse(localScore, scoreObjs);
+    var standardResponse = new StandardResponse(localScore, scoreObjs);
     return standardResponse;
 }
 
@@ -247,8 +249,7 @@ function getCardValueToMyCrib(rank1, rank2)
     return dropTable[rank1][rank2];
 
 }
-exports.getCardValueToMyCrib = getCardValueToMyCrib;
-exports.getCardValueToYourCrib = getCardValueToYourCrib;
+
 function getCardValueToYourCrib(rank1, rank2)
 {
     var aceDrop = [6.02, 5.07, 5.07, 5.72, 6.01, 4.91, 4.89, 4.85, 4.55, 4.48, 4.68, 4.33, 4.30];
@@ -287,8 +288,6 @@ function getCardValueToYourCrib(rank1, rank2)
 //  hand - an array of cards (4 of them)
 //  sharedCard - 1 card
 //  isCrib - Crib or Hand
-
-exports.scoreHand = scoreHand;
 function scoreHand(hand, sharedCard, isCrib)
 {
     var localScore = 0;
@@ -343,7 +342,7 @@ function scoreHand(hand, sharedCard, isCrib)
     }
 
 
-    var standardResponse = new StandardScoringResponse(localScore, scoreList);
+    var standardResponse = new StandardResponse(localScore, scoreList);
     return standardResponse;
 
 }
@@ -394,7 +393,7 @@ function scoreFlush(hand, isCrib)
     var score = new Score(ScoreName.Flush, max, flushCards);
     var scoreList = [];
     scoreList.push(score);
-    var standardResponse = new StandardScoringResponse(max, scoreList);
+    var standardResponse = new StandardResponse(max, scoreList);
     return standardResponse;
 }
 
@@ -456,7 +455,7 @@ function scoreRuns(hand)
         }
     }
 
-    var standardResponse = new StandardScoringResponse(localScore, scoreList);
+    var standardResponse = new StandardResponse(localScore, scoreList);
     return standardResponse;
 
 }
@@ -577,7 +576,7 @@ function scorePairs(hand)
         }
     }
 
-    var ret = new StandardScoringResponse(score, scoreList);
+    var ret = new StandardResponse(score, scoreList);
     return ret;
 }
 
@@ -699,7 +698,7 @@ function scoreFifteens(cards)
         }
     }
 
-    var ret = new StandardScoringResponse(localScore, scoreList);
+    var ret = new StandardResponse(localScore, scoreList);
 
     return ret;
 }
@@ -778,3 +777,13 @@ function Is3CardRun(card1, card2, card3)
 
     return false;
 }
+
+exports.scoreHand = scoreHand;
+exports.getCardValueToMyCrib = getCardValueToMyCrib;
+exports.getCardValueToYourCrib = getCardValueToYourCrib;
+exports.ScoreName = ScoreName;
+exports.StandardResponse = StandardResponse;
+exports.scoreCountingCardsPlayed = scoreCountingCardsPlayed;
+exports.Score = Score;
+exports.NoScoreResponse = NoScoreResponse;
+
