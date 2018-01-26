@@ -3,16 +3,18 @@ CribbageJS
 this project implements a set of REST APIs that allow you to build a cribbage application.
 
 Layout
-+
-+CribbageJS
-    +Cribbage
-        +Game
+-------
+-CribbageJS
+    -Cribbage
+        -Game
             - card.js:        implements a simple card class.
             - scoring.js:     implements all of the cribbage scoring (counting, hand, and crib)
             - selectcard.js   implements the api to pick the crib or the next card to count
         - server.js           implements the REST API
 
-the response is (usually) a JSON object encapsulated in scoreing.js\StandardResponse.  it will return the score along with a list
+Response
+---------
+The response is (usually) a JSON object encapsulated in scoreing.js\StandardResponse.  it will return the score along with a list
 that contains the reason for the score ("ScoreName"), the value of the score, and the list of cards that contributed the score. eg.
 
         "ScoreName": "Fifteen",
@@ -37,6 +39,10 @@ that contains the reason for the score ("ScoreName"), the value of the score, an
                 "Suit": "Hearts"
             }
         ]
+
+if you send a bad card, the service returns a 404 with something that looks like
+
+ - Bad Card: FourOFClubs
 
 APIs
 ====
