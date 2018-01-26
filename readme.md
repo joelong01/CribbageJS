@@ -104,6 +104,7 @@ sample return value:
                             "Value": 6,
                             "Suit": "Hearts"
 
+
 },
                         {
                             "Ordinal": "Nine",
@@ -149,13 +150,13 @@ GET /getnextcountedcard/:cardsleft/:currentCount/:countedcards
 the services verifies that CurrentCount is correct.  I do this instead of calculating it on the service because I think I'll like having the check from the clients perspective.
 
 URL example:
+
                localhost:8080/api/getnextcountedcard/AceOfSpades,AceOfHearts,TwoOfClubs,TenOfDiamonds/0
                localhost:8080/api/getnextcountedcard/AceOfSpades,ThreeOfClubs/4/AceOfHearts,TwoOfClubs,TenOfDiamonds
                localhost:8080/api/getnextcountedcard/TenOfClubs,AceOfHearts/16/AceOfSpades,ThreeOfClubs,TwoOfClubs,TenOfHearts
-               localhost:8080/api/getnextcountedcard/AceOfHearts/29/AceOfSpades,ThreeOfClubs,TwoOfClubs,TenOfHearts,TenOfClubs,ThreeOfDiamonds
-
-Note that the last parameters contains all the cards that have already been counted, which means it starts empty, so there are two routes.
-I trim spaces, but Cards must be spelled correctly
+           
+Note that the last parameters contains all the cards that have already been counted, which means it starts empty, so there are two
+routes. I trim spaces, but Cards must be spelled correctly
 
 example return:
 
@@ -171,19 +172,22 @@ GET /scorecountedcards/:playedcard/:currentCount
 GET /scorecountedcards/:playedcard/:currentCount/:countedcards/
 -------------------------------------------------
 
-   playedcard:     the card that was just played  
-   currentcount:   the sum % 31 of counted cards
-   countedcards:   the CSV list of cards that have been counted
+    playedcard:     the card that was just played  
+    currentcount:   the sum % 31 of counted cards
+    countedcards:   the CSV list of cards that have been counted
 
 URL examples:
-               localhost:8080/api/scorecountedcards/AceOfSpades/0
-               localhost:8080/api/scorecountedcards/AceOfHearts/1/AceOfSpades
-               localhost:8080/api/scorecountedcards/AceOfClubs/2/AceOfHearts,AceOfSpades
-               localhost:8080/api/scorecountedcards/TwoOfClubs/13/AceOfHearts,ThreeOfClubs,FiveOfDiamonds,FourOfClubs
 
-returns the StandardScoring object that contains the sum of the scores that result along with a list of objects that contain the score, reason, and cards for each score resulting from playing the card.
+    localhost:8080/api/scorecountedcards/AceOfSpades/0
+    localhost:8080/api/scorecountedcards/AceOfHearts/1/AceOfSpades
+    localhost:8080/api/scorecountedcards/AceOfClubs/2/AceOfHearts,AceOfSpades
+    localhost:8080/api/scorecountedcards/TwoOfClubs/13/AceOfHearts,ThreeOfClubs,FiveOfDiamonds,FourOfClubs
+
+returns the StandardScoring object that contains the sum of the scores that result along with a list of objects that contain the score,
+reason, and cards for each score resulting from playing the card.
 
 example return:
+
     {
         "Score": 2,
         "ScoreInfo": [
