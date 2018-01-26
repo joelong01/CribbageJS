@@ -51,6 +51,22 @@ eg the mispelled card ('OF' instead of 'Of')
 APIs
 ====
 
+GET: /allcards
+--------------
+
+returns all the cards in JSON format.  Useful to build a deck and send back the exact right values to the service to make all the 
+other APIs work.
+
+sample URL:
+
+     localhost:8080/api/allcards
+     
+return sample:{ "AceOfClubs": { "Ordinal": "Ace", "Rank": 1, "Value": 1, "Suit": "Clubs" }, "AceOfDiamonds": { "Ordinal": "Ace", "Rank": 1, "Value": 1, "Suit": "Diamonds" } } ...
+        
+
+
+     
+
 GET: /scorehand/:hand/:sharedcard/:isCrib
 -----------------------------------------
 
@@ -103,9 +119,7 @@ sample return value:
                             "Rank": 6,
                             "Value": 6,
                             "Suit": "Hearts"
-
-
-},
+                        },
                         {
                             "Ordinal": "Nine",
                             "Rank": 9,
