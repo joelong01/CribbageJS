@@ -1,4 +1,5 @@
 CribbageJS
+==========
 
 this project implements a set of REST APIs that allow you to build a cribbage application.  Cards are spelled as NameOfSuit (e.g. AceOfSpades or KingOfClubs).
 Card names are trimmed, but CaseSensitive.  
