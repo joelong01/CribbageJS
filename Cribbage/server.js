@@ -15,6 +15,16 @@ app.use(bodyParser.urlencoded({ extended: false }));
 var port = process.env.port || 8080;
 var router = express.Router();
 
+router.get(['/', '/help', '/readme'], function (req, res, next)
+{
+  var file = __dirname + '/readme.md';
+  res.download(file); // Set disposition and send it.
+});
+router.get('/help', function (req, res, next)
+{
+  var file = __dirname + '/readme.md';
+  res.download(file); // Set disposition and send it.
+});
 
 router.get('/suits', function (req, res)
 {
@@ -193,6 +203,7 @@ router.get('/scorecountedcards/:playedcard/:currentCount', function (req, res, n
 //  URL examples:
 //                 localhost:8080/api/scorecountedcards/AceOfHearts/1/AceOfSpades
 //                 localhost:8080/api/scorecountedcards/AceOfClubs/2/AceOfHearts,AceOfSpades
+//                 localhost:8080/api/scorecountedcards/TwoOfClubs/13/AceOfHearts,ThreeOfClubs,FiveOfDiamonds,FourOfClubs
 //
 //  Note: this is a GET for /scorecountedcards just like above, it just has one more parameter 
 //
