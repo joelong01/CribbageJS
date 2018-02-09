@@ -237,3 +237,5 @@ function selectCountedCard(countedCards, cardsLeft, currentCount)
     return maxCard;
 
 }
+
+

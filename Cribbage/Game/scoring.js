@@ -6,7 +6,7 @@ var Helpers = require('./globalhelpers');
 // all the different ways you can score in cribbage
 var ScoreName = new Enum(
     {
-    "Fifteen": 0,
+    "Fifteen": 0, 
     "Run": 1,
     "Pair": 2,
     "ThreeOfaKind": 3,

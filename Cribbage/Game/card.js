@@ -36,6 +36,7 @@ var Ordinal = new Enum(
     }, { freez: true });
 
 
+    var CardNames = [];
 
 
 //
@@ -51,6 +52,7 @@ function Init()
         {
             var c = new Card(Ordinal.get(i, 0), i, i < 10 ? i : 10, Suit.get(j, 0));
             var name = c.toString();
+            CardNames.push(name);
             Deck[name] = c;
         }
     }
@@ -73,6 +75,20 @@ Card.prototype.toString = function ()
     return this.Ordinal.key + "Of" + this.Suit.key;
 };
 
+//
+//  this is the class you JSON.stringify() to return a randomized hand to the caller
+//
+function Hands(hand1, hand2, shared)
+{
+    this.hand1 = hand1;
+    this.hand2 = hand2;
+    this.sharedCard = shared;
+    this.allCards = hand1.concat(hand2);
+    this.allCards.push(shared);
+}
+
+
+
 /*
     Exports defined AT THE END of the module so that they are defined.
     painful lesson to learn.
@@ -82,5 +98,7 @@ exports.Suit = Suit;
 exports.Init = Init;
 exports.Card = Card;
 exports.Deck = Deck;
+exports.Hands = Hands;
+exports.CardNames = CardNames;
 
 
