@@ -4,7 +4,6 @@ CribbageJS
 this project implements a set of REST APIs that allow you to build a cribbage application.  Cards are spelled as NameOfSuit (e.g. AceOfSpades or KingOfClubs).
 Card names are trimmed, but CaseSensitive.  
 
-
 Layout
 -------
 - CribbageJS
@@ -17,8 +16,7 @@ Layout
 
 Response
 ---------
-The response is (usually) a JSON object encapsulated in scoreing.js\StandardResponse.  it will return the score along with a list
-that contains the reason for the score ("ScoreName"), the value of the score, and the list of cards that contributed the score. eg.
+The response is (usually) a JSON object encapsulated in scoreing.js\StandardResponse.  it will return the score along with a list that contains the reason for the score ("ScoreName"), the value of the score, and the list of cards that contributed the score. eg.
 
         "ScoreName": "Fifteen",
         "Score": 2,

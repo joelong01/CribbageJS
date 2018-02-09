@@ -5,6 +5,8 @@ var app = express();
 var scoring = require('./Game/scoring');
 var cards = require('./Game/card');
 var SelectCards = require('./Game/selectcards');
+var request = require('request');
+
 
 
 app.use(bodyParser.json());
@@ -17,13 +19,13 @@ var router = express.Router();
 
 router.get(['/', '/help', '/readme'], function (req, res, next)
 {
-  var file = __dirname + '/readme.md';
-  res.download(file); // Set disposition and send it.
+    var file = __dirname + '/readme.md';
+    res.download(file); // Set disposition and send it.
 });
 router.get('/help', function (req, res, next)
 {
-  var file = __dirname + '/readme.md';
-  res.download(file); // Set disposition and send it.
+    var file = __dirname + '/readme.md';
+    res.download(file); // Set disposition and send it.
 });
 
 router.get('/suits', function (req, res)
@@ -188,6 +190,8 @@ router.get('/getnextcountedcard/:cardsleft/:currentCount/:countedcards', functio
 });
 
 //
+//  returns a randomized hand for player1, player2, and shared  
+//
 //  URL example:
 //                 localhost:8080/api/scorecountedcards/AceOfSpades/0
 //                   
@@ -245,6 +249,35 @@ router.get('/scorecountedcards/:playedcard/:currentCount/:countedcards/', functi
 
 });
 
+//
+//
+//  returns a randomized hand of 13 cards.  calls random.org to get the random numbers.
+//  uses the background radiation of the universe.  go figure. 
+//  
+//  client can divide them up however they want (e.g. alternate for player1/player2).
+//  because they are...random.
+//
+//  URL examples:
+//                 localhost:8080/api/getrandomhand
+//
+router.get('/getrandomhand/', function (req, res, next)
+{
+    let url = 'https://www.random.org/sequences/?min=0&max=52&col=1&format=plain&rnd=new';
+    request(url, function (error, response, body)
+    {        
+        var nums = body.split('\n');
+        var randomCards = [];
+        
+        for (let i=0; i<13; i++)
+        {
+            randomCards.push(cards.CardNames[nums[i]]);            
+        }
+
+        res.send(JSON.stringify({RandomCards: randomCards}));
+     });
+
+     
+});
 
 app.use('/api', router);
 app.listen(port);
