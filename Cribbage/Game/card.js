@@ -33,8 +33,15 @@ var Ordinal = new Enum(
         'Jack': 11,
         'Queen': 12,
         'King': 13
-    }, { freez: true });
+    }, { freeze: true });
 
+    var Owner = new Enum (
+        {
+            'computer': 1,
+            'player' : 2,
+            'shared' : 3
+
+        }, {freeze: true});
 
     var CardNames = [];
 
@@ -67,13 +74,22 @@ var Card = function Card(ordinal, rank, value, suit)
     this.Rank = rank;       // 1...13 used for runs
     this.Value = value;     // 1-10 used for counting
     this.Suit = suit;       // enum like Spades
-
+    this.name = this.Ordinal.key + "Of" + this.Suit.key;
+    
 };
 
 Card.prototype.toString = function ()
 {
-    return this.Ordinal.key + "Of" + this.Suit.key;
+    return this.name;
 };
+
+var ClientCard = function ClientCard(card, owner)
+{
+    this.name = card.name;
+    this.orientation = "facedown";
+    this.location = "deck";
+    this.owner =  owner;
+}
 
 //
 //  this is the class you JSON.stringify() to return a randomized hand to the caller
@@ -100,5 +116,6 @@ exports.Card = Card;
 exports.Deck = Deck;
 exports.Hands = Hands;
 exports.CardNames = CardNames;
+exports.ClientCard = ClientCard;
 
 
