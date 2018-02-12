@@ -55,7 +55,7 @@ router.get('/card/:name', function (req, res)
 app.use(function (req, res, next)
 {
 
-    console.log("app.use called");
+    
     // Website you wish to allow to connect
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
 
@@ -294,16 +294,22 @@ router.get('/getrandomhand/:isComputerCrib', function (req, res, next)
         var nums = body.split('\n');
         var randomCards = [];
         var isComputerCrib = JSON.parse(req.params.isComputerCrib);
-        let firstOwner = (isComputerCrib) ? "computer" : "player";
-        let secondOwner = !(isComputerCrib) ? "computer" : "player";
+        let me = "player"; 
+        let you = "computer";
+        if (isComputerCrib)
+        {
+            me = "computer";
+            you = "player";
+        }
+        let hand = [];
         for (let i = 0; i < 12; i += 2)
         {
             let card = cards.Deck[cards.CardNames[nums[i]]];
-            let clientCard = new cards.ClientCard(card, firstOwner);            
+            let clientCard = new cards.ClientCard(card, you);            
             randomCards.unshift(clientCard);
             card = cards.Deck[cards.CardNames[nums[i + 1]]];
-            clientCard = new cards.ClientCard(card, secondOwner); 
-            
+            clientCard = new cards.ClientCard(card, me); 
+            hand.push(card);
             randomCards.unshift(clientCard);
 
         }
@@ -311,7 +317,10 @@ router.get('/getrandomhand/:isComputerCrib', function (req, res, next)
         let clientCard = new cards.ClientCard(card, "shared");     
         randomCards.unshift(clientCard);
 
-        res.send(JSON.stringify({ RandomCards: randomCards }));
+        let cribCards = SelectCards.selectCribCards(hand, isComputerCrib);
+
+
+        res.send(JSON.stringify({ RandomCards: randomCards, ComputerCribCards: cribCards}));
     });
 
 
