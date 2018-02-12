@@ -9,6 +9,7 @@ var request = require('request');
 
 
 
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -51,7 +52,8 @@ router.get('/card/:name', function (req, res)
 });
 
 // Add headers
-app.use(function (req, res, next) {
+app.use(function (req, res, next)
+{
 
     console.log("app.use called");
     // Website you wish to allow to connect
@@ -277,29 +279,42 @@ router.get('/scorecountedcards/:playedcard/:currentCount/:countedcards/', functi
 //  returns a randomized hand of 13 cards.  calls random.org to get the random numbers.
 //  uses the background radiation of the universe.  go figure. 
 //  
-//  client can divide them up however they want (e.g. alternate for player1/player2).
-//  because they are...random.
 //
 //  URL examples:
-//                 localhost:8080/api/getrandomhand
+//                 localhost:8080/api/getrandomhand/true
 //
-router.get('/getrandomhand/', function (req, res, next)
+router.get('/getrandomhand/:isComputerCrib', function (req, res, next)
 {
-    let url = 'https://www.random.org/sequences/?min=0&max=52&col=1&format=plain&rnd=new';
+    let url = 'https://www.random.org/sequences/?min=0&max=51&col=1&format=plain&rnd=new';
+
+    var respObj = {};
+
     request(url, function (error, response, body)
-    {        
+    {
         var nums = body.split('\n');
         var randomCards = [];
-        
-        for (let i=0; i<13; i++)
+        var isComputerCrib = JSON.parse(req.params.isComputerCrib);
+        let firstOwner = (isComputerCrib) ? "computer" : "player";
+        let secondOwner = !(isComputerCrib) ? "computer" : "player";
+        for (let i = 0; i < 12; i += 2)
         {
-            randomCards.push(cards.CardNames[nums[i]]);            
+            let card = cards.Deck[cards.CardNames[nums[i]]];
+            let clientCard = new cards.ClientCard(card, firstOwner);            
+            randomCards.unshift(clientCard);
+            card = cards.Deck[cards.CardNames[nums[i + 1]]];
+            clientCard = new cards.ClientCard(card, secondOwner); 
+            
+            randomCards.unshift(clientCard);
+
         }
+        let card = cards.Deck[cards.CardNames[nums[12]]];
+        let clientCard = new cards.ClientCard(card, "shared");     
+        randomCards.unshift(clientCard);
 
-        res.send(JSON.stringify({RandomCards: randomCards}));
-     });
+        res.send(JSON.stringify({ RandomCards: randomCards }));
+    });
 
-     
+
 });
 
 app.use('/api', router);
