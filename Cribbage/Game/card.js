@@ -89,6 +89,7 @@ var ClientCard = function ClientCard(card, owner)
     this.orientation = "facedown";
     this.location = "deck";
     this.owner =  owner;
+    this.value = card.Value;
 }
 
 //
