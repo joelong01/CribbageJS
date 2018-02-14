@@ -314,13 +314,13 @@ router.get('/getrandomhand/:isComputerCrib', function (req, res, next)
 
         }
         let card = cards.Deck[cards.CardNames[nums[12]]];
-        let clientCard = new cards.ClientCard(card, "shared");     
-        randomCards.unshift(clientCard);
+        let sharedCard = new cards.ClientCard(card, "shared");     
+        randomCards.unshift(sharedCard);
 
         let cribCards = SelectCards.selectCribCards(hand, isComputerCrib);
 
 
-        res.send(JSON.stringify({ RandomCards: randomCards, ComputerCribCards: cribCards}));
+        res.send(JSON.stringify({ RandomCards: randomCards, ComputerCribCards: cribCards, SharedCard: sharedCard, HisNibs: card.Ordinal.key === "Jack" ? true : false}));
     });
 
 
