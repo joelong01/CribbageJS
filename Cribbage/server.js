@@ -210,7 +210,10 @@ router.get('/getnextcountedcard/:cardsleft/:currentCount/:countedcards', functio
     }
     var currentCount = Number(req.params.currentCount);
     var ret = SelectCards.selectCountedCard(countedCards, cardsLeft, currentCount);
-    res.send(ret);
+
+    var standardResponse = scoring.scoreCountingCardsPlayed(countedCards, ret, currentCount + ret.Value);
+
+    res.send({countedCard: ret, Scoring: standardResponse});
 
 });
 
