@@ -479,8 +479,7 @@ function getRuns(list)
 
             if (count > 4)
             {
-                list.splice(4, 1); // list.RemoveAt(4)
-                list.RemoveAt(4);
+                list.splice(4, 1); // list.RemoveAt(4)                
             }
 
             return list.splice(0); // 4 card run
