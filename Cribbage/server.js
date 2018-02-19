@@ -180,7 +180,7 @@ router.get('/getnextcountedcard/:cardsleft/:currentCount', function (req, res, n
     }
     var currentCount = Number(req.params.currentCount);
     var ret = SelectCards.selectCountedCard(countedCards, cardsLeft, currentCount);
-    res.send(ret);
+    res.send( {countedCard: ret, Scoring: {Score: 0, ScoreInfo: []}});
 });
 //
 //  URL examples:
