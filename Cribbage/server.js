@@ -55,7 +55,7 @@ router.get('/card/:name', function (req, res)
 app.use(function (req, res, next)
 {
 
-    
+
     // Website you wish to allow to connect
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
 
@@ -213,7 +213,7 @@ router.get('/getnextcountedcard/:cardsleft/:currentCount/:countedcards', functio
 
     var standardResponse = scoring.scoreCountingCardsPlayed(countedCards, ret, currentCount + ret.Value);
 
-    res.send({countedCard: ret, Scoring: standardResponse});
+    res.send({ countedCard: ret, Scoring: standardResponse });
 
 });
 
@@ -297,33 +297,34 @@ router.get('/getrandomhand/:isComputerCrib', function (req, res, next)
         var nums = body.split('\n');
         var randomCards = [];
         var isComputerCrib = JSON.parse(req.params.isComputerCrib);
-        let me = "player"; 
+        let me = "player";  // from the perspective of the dealer
         let you = "computer";
         if (isComputerCrib)
         {
             me = "computer";
             you = "player";
         }
-        let hand = [];
+        let computerHand = [];
         for (let i = 0; i < 12; i += 2)
         {
-            let card = cards.Deck[cards.CardNames[nums[i]]];
-            let clientCard = new cards.ClientCard(card, you);            
+            let youCard = cards.Deck[cards.CardNames[nums[i]]];     // get the random card
+            let clientCard = new cards.ClientCard(youCard, you);    // put it into a format the client needs.
+            randomCards.unshift(clientCard);                        // put it in the list of all cards at the 0th position
+            let meCard = cards.Deck[cards.CardNames[nums[i + 1]]];  // the next one belongs to the other player, get the random card from the deck 
+            clientCard = new cards.ClientCard(meCard, me);          // put it into the right list         
             randomCards.unshift(clientCard);
-            card = cards.Deck[cards.CardNames[nums[i + 1]]];
-            clientCard = new cards.ClientCard(card, me); 
-            hand.push(card);
-            randomCards.unshift(clientCard);
+
+            computerHand.push(isComputerCrib ? meCard : youCard); // need this hand to get the crib cards for the client
 
         }
         let card = cards.Deck[cards.CardNames[nums[12]]];
-        let sharedCard = new cards.ClientCard(card, "shared");     
+        let sharedCard = new cards.ClientCard(card, "shared");
         randomCards.unshift(sharedCard);
 
-        let cribCards = SelectCards.selectCribCards(hand, isComputerCrib);
+        let cribCards = SelectCards.selectCribCards(computerHand, isComputerCrib);
 
 
-        res.send(JSON.stringify({ RandomCards: randomCards, ComputerCribCards: cribCards, SharedCard: sharedCard, HisNibs: card.Ordinal.key === "Jack" ? true : false}));
+        res.send(JSON.stringify({ RandomCards: randomCards, ComputerCribCards: cribCards, SharedCard: sharedCard, HisNibs: card.Ordinal.key === "Jack" ? true : false }));
     });
 
 
