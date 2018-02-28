@@ -322,28 +322,28 @@ function scoreHand(hand, sharedCard, isCrib)
     var scores = scoreFifteens(cards);
     if (scores.Score > 0)
     {
-        scoreList.push(scores.ScoreInfo.slice(0));
+        scoreList = scoreList.concat(scores.ScoreInfo);
         localScore += scores.Score;
     }
 
     scores = scorePairs(cards);
     if (scores.Score > 0)
     {
-        scoreList.push(scores.ScoreInfo.slice(0));
+        scoreList = scoreList.concat(scores.ScoreInfo);
         localScore += scores.Score;
     }
 
     scores = scoreRuns(cards);
     if (scores.Score > 0)
     {
-        scoreList.push(scores.ScoreInfo.slice(0));
+        scoreList = scoreList.concat(scores.ScoreInfo);
         localScore += scores.Score;
     }
 
     scores = scoreFlush(cards, isCrib);
     if (scores != null)
     {
-        scoreList.push(scores.ScoreInfo.slice(0));
+        scoreList = scoreList.concat(scores.ScoreInfo);
         localScore += scores.Score;
     }
 
