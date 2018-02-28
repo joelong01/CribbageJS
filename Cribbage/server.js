@@ -162,6 +162,7 @@ function parseCards(handAsString, res)
 //
 //  URL example:
 //                 localhost:8080/api/getnextcountedcard/AceOfSpades,AceOfHearts,TwoOfClubs,TenOfDiamonds/0
+//                 http://localhost:8080/api/getnextcountedcard/FiveOfClubs,QueenOfDiamonds/25/ThreeOfDiamonds,TenOfClubs,TwoOfSpades,QueenOfSpades
 //
 //  Note that the last parameters contains all the cards that have already been counted, which means it starts empty, so there are two routes.
 //  I trim spaces, but Cards must be spelled correctly

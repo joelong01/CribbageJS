@@ -72,6 +72,12 @@ function NoScoreResponse()
 
 function scoreCountingCardsPlayed(countedCards, card, currentCount)
 {
+    if (card === null)
+    { 
+        let standardResponse = new StandardResponse(0, []);
+        return standardResponse;
+
+    }
     var localScore = 0;
 
     var scoreObjs = [];

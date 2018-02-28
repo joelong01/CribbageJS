@@ -45,8 +45,7 @@ function selectCribCards(hand, isMyCrib)
             expectedValue = CardScoring.getCardValueToYourCrib(crib[0].Rank - 1, crib[1].Rank - 1);            
             score = score - expectedValue;
             
-        }
-
+        }        
         if (score > maxScore)
         {
             
@@ -111,6 +110,11 @@ function selectCountedCard(countedCards, cardsLeft, currentCount)
     for (var i = 0; i < cardsLeft.length; i++)    
     {
         var card = cardsLeft[i];
+        if (card.Value + currentCount > 31)
+        {
+            continue;
+        }
+        
         score = CardScoring.scoreCountingCardsPlayed(countedCards, card, currentCount).Score; // scoreCountingCardsPlayed returns a StandardResponse
         if (score > maxScore)
         {
