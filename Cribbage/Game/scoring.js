@@ -401,12 +401,12 @@ function scoreRuns(hand)
 {
     var cardLists = DemuxPairs(hand);
 
-    var runs = [[]];
+    var runs = [];
     for (var i = 0; i < cardLists.length; i++)
     {
         var cards = cardLists[i];
         var l = getRuns(cards);
-        if (l != null)
+        if (l !== null && l.length > 0)
         {
             runs.push(l);
         }
