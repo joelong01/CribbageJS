@@ -85,11 +85,22 @@ Card.prototype.toString = function ()
 
 var ClientCard = function ClientCard(card, owner)
 {
-    this.name = card.name;
+    this.cardName = card.name;
     this.orientation = "facedown";
     this.location = "deck";
     this.owner =  owner;
     this.value = card.Value;
+    this.ordinal = card.Ordinal.value;
+}
+
+function cardArrayToClientCardArray(cards)
+{
+    var clientCards = [];
+    for (var card of cards)
+    {
+        clientCards.push(new ClientCard(card, "unknown"));
+    }
+    return clientCards;
 }
 
 //
@@ -118,5 +129,6 @@ exports.Deck = Deck;
 exports.Hands = Hands;
 exports.CardNames = CardNames;
 exports.ClientCard = ClientCard;
+exports.cardArrayToClientCardArray = cardArrayToClientCardArray;
 
 

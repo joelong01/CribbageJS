@@ -128,7 +128,7 @@ router.get('/getcribcards/:hand/:isMyCrib', function (req, res, next)
     }
     var isMyCrib = JSON.parse(req.params.isMyCrib);
     var crib = SelectCards.selectCribCards(hand, isMyCrib);
-    res.send(crib);
+    res.send(cards.cardArrayToClientCardArray(crib));
 
 });
 //
@@ -182,7 +182,7 @@ router.get('/getnextcountedcard/:cardsleft/:currentCount', function (req, res, n
     }
     var currentCount = Number(req.params.currentCount);
     var ret = SelectCards.selectCountedCard(countedCards, cardsLeft, currentCount);
-    res.send( {countedCard: ret, Scoring: {Score: 0, ScoreInfo: []}});
+    res.send( {countedCard: new cards.ClientCard(ret), Scoring: {Score: 0, ScoreInfo: []}});
 });
 //
 //  URL examples:
@@ -215,7 +215,7 @@ router.get('/getnextcountedcard/:cardsleft/:currentCount/:countedcards', functio
 
     var standardResponse = scoring.scoreCountingCardsPlayed(countedCards, ret, currentCount);
 
-    res.send({ countedCard: ret, Scoring: standardResponse });
+    res.send({ countedCard: new cards.ClientCard(ret), Scoring: standardResponse });
 
 });
 
@@ -326,7 +326,7 @@ router.get('/getrandomhand/:isComputerCrib', function (req, res, next)
         let cribCards = SelectCards.selectCribCards(computerHand, isComputerCrib);
 
 
-        res.send(JSON.stringify({ RandomCards: randomCards, ComputerCribCards: cribCards, SharedCard: sharedCard, HisNibs: card.Ordinal.key === "Jack" ? true : false }));
+        res.send(JSON.stringify({ RandomCards: randomCards, ComputerCribCards: cards.cardArrayToClientCardArray(cribCards), SharedCard: sharedCard, HisNibs: card.Ordinal.key === "Jack" ? true : false }));
     });
 
 

@@ -1,4 +1,4 @@
-
+var cards = require('./card');
 var Enum = require('enum');
 var Helpers = require('./globalhelpers');
 
@@ -31,15 +31,15 @@ var Score = function Score(name, score, playedCards, card)
     this.Cards = [];
     if (playedCards.constructor === Array)
     {
-        this.Cards = playedCards.slice(0);
+        this.Cards = cards.cardArrayToClientCardArray(playedCards.slice(0));
     }
     else
     {
-        this.Cards.push(playedCards);
+        this.Cards.push(new cards.ClientCard(playedCards, "unknown"));
     }
     if (card != null)
     {
-        this.Cards.push(card);
+        this.Cards.push(new cards.ClientCard(card, "unknown"));
     }
 };
 
