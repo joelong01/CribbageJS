@@ -31,15 +31,15 @@ var Score = function Score(name, score, playedCards, card)
     this.Cards = [];
     if (playedCards.constructor === Array)
     {
-        this.Cards = cards.cardArrayToClientCardArray(playedCards.slice(0));
+        this.Cards = playedCards.slice(0);
     }
     else
     {
-        this.Cards.push(new cards.ClientCard(playedCards, "unknown"));
+        this.Cards.push(playedCards);
     }
     if (card != null)
     {
-        this.Cards.push(new cards.ClientCard(card, "unknown"));
+        this.Cards.push(card);
     }
 };
 
