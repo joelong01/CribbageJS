@@ -297,6 +297,29 @@ router.get('/getrandomhand/:isComputerCrib', function (req, res, next)
     request(url, function (error, response, body)
     {
         var nums = body.split('\n');
+        return getRandomHand(nums, true, req, res, next);
+        
+    });
+
+
+});
+//
+//
+//  this passes back in a sequence that was probably returned by the other getrandomhand call so we 
+//  can have repeatable results and debug when a hand is returned wrong.
+//  
+//
+//  URL examples:
+//                 localhost:8080/api/getrandomhand/true/46,17,10,35,43,44,1,38,14,3,7,50,19,15,2,48,8,25,13,6,42,40,27,28,21,36,33,26,51,16,32,9,12,4,45,37,30,49,47,34,5,20,11,22,0,39,18,24,29,41,23,31,
+//
+router.get('/getrandomhand/:isComputerCrib/:sequence',  (req, res, next) =>
+{
+    let nums = req.params.sequence.split(",");
+    return getRandomHand(nums, false, req, res, next);
+});
+
+function getRandomHand(nums, addSequence, req, res, next)
+{
         var randomCards = [];
         var isComputerCrib = JSON.parse(req.params.isComputerCrib);
         let me = "player";  // from the perspective of the dealer
@@ -324,11 +347,13 @@ router.get('/getrandomhand/:isComputerCrib', function (req, res, next)
         sharedCard.Owner = "shared";
         randomCards.unshift(sharedCard);
         let cribCards = SelectCards.selectCribCards(computerHand, isComputerCrib);
-        res.send(JSON.stringify({ RandomCards: randomCards, ComputerCribCards: cribCards, SharedCard: sharedCard, HisNibs: card.Ordinal.key === "Jack" ? true : false }));
-    });
-
-
-});
+        let url = req.hostname + ":" + req.connection.localPort + req.originalUrl;
+        if (addSequence)
+        {
+            url += "/" + nums.map( n => n).toString();
+        }
+        res.send(JSON.stringify({ RandomCards: randomCards, ComputerCribCards: cribCards, SharedCard: sharedCard, HisNibs: card.Ordinal.key === "Jack" ? true : false, RepeatUrl: url }));
+}
 
 app.use('/api', router);
 app.listen(port);
