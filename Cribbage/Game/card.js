@@ -53,6 +53,7 @@ var CardNames = [];
 function Init()
 {
     console.log('Card Init called');
+    let idx = 0;
     for (var i = 1; i < 14; i++)
     {
 
@@ -62,6 +63,7 @@ function Init()
             var name = c.toString();
             CardNames.push(name);
             Deck[name] = c;
+           // console.log ("%s\t%s", idx++, name);
         }
     }
 }

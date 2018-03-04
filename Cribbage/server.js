@@ -352,7 +352,7 @@ function getRandomHand(nums, addSequence, req, res, next)
         {
             url += "/" + nums.map( n => n).toString();
         }
-        res.send(JSON.stringify({ RandomCards: randomCards, ComputerCribCards: cribCards, SharedCard: sharedCard, HisNibs: card.Ordinal.key === "Jack" ? true : false, RepeatUrl: url }));
+        res.send(JSON.stringify({ RandomCards: randomCards, ComputerCribCards: cribCards, SharedCard: sharedCard, HisNobs: card.Ordinal === 11 ? true : false, RepeatUrl: url }));
 }
 
 app.use('/api', router);
