@@ -132,7 +132,7 @@ function cutCards(nums, addSequenceToUrl, req, res, next)
     var card1 = cards.Deck[cards.CardNames[nums[0]]]
     var card2 = cards.Deck[cards.CardNames[nums[1]]]   
   
-    let cutCardsObj = { Player: card1, Computer: card2, RepeatUrl: url};
+    let cutCardsObj ={CutCards: { Player: card1, Computer: card2, RepeatUrl: url}};
     return cutCardsObj;
 }
 
