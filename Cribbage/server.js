@@ -16,6 +16,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 
 var port = process.env.port || 8080;
+
 var router = express.Router();
 
 router.get(['/', '/help', '/readme'], function (req, res, next)
@@ -52,7 +53,7 @@ router.get('/card/:name', function (req, res)
 });
 
 // Add headers
-/* app.use(function (req, res, next)
+app.use(function (req, res, next)
 {
 
     console.log("app.use called");
@@ -72,7 +73,7 @@ router.get('/card/:name', function (req, res)
 
     // Pass to next layer of middleware
     next();
-}); */
+});
 
 
 //
