@@ -1,4 +1,4 @@
-
+var cards = require('./card');
 var Enum = require('enum');
 var Helpers = require('./globalhelpers');
 
@@ -72,6 +72,12 @@ function NoScoreResponse()
 
 function scoreCountingCardsPlayed(countedCards, card, currentCount)
 {
+    if (card === null)
+    { 
+        let standardResponse = new StandardResponse(0, []);
+        return standardResponse;
+
+    }
     var localScore = 0;
 
     var scoreObjs = [];
@@ -316,28 +322,28 @@ function scoreHand(hand, sharedCard, isCrib)
     var scores = scoreFifteens(cards);
     if (scores.Score > 0)
     {
-        scoreList.push(scores.ScoreInfo.slice(0));
+        scoreList = scoreList.concat(scores.ScoreInfo);
         localScore += scores.Score;
     }
 
     scores = scorePairs(cards);
     if (scores.Score > 0)
     {
-        scoreList.push(scores.ScoreInfo.slice(0));
+        scoreList = scoreList.concat(scores.ScoreInfo);
         localScore += scores.Score;
     }
 
     scores = scoreRuns(cards);
     if (scores.Score > 0)
     {
-        scoreList.push(scores.ScoreInfo.slice(0));
+        scoreList = scoreList.concat(scores.ScoreInfo);
         localScore += scores.Score;
     }
 
     scores = scoreFlush(cards, isCrib);
     if (scores != null)
     {
-        scoreList.push(scores.ScoreInfo.slice(0));
+        scoreList = scoreList.concat(scores.ScoreInfo);
         localScore += scores.Score;
     }
 
@@ -401,12 +407,12 @@ function scoreRuns(hand)
 {
     var cardLists = DemuxPairs(hand);
 
-    var runs = [[]];
+    var runs = [];
     for (var i = 0; i < cardLists.length; i++)
     {
         var cards = cardLists[i];
         var l = getRuns(cards);
-        if (l != null)
+        if (l !== null && l.length > 0)
         {
             runs.push(l);
         }
@@ -479,8 +485,7 @@ function getRuns(list)
 
             if (count > 4)
             {
-                list.splice(4, 1); // list.RemoveAt(4)
-                list.RemoveAt(4);
+                list.splice(4, 1); // list.RemoveAt(4)                
             }
 
             return list.splice(0); // 4 card run

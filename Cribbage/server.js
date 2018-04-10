@@ -55,7 +55,7 @@ router.get('/card/:name', function (req, res)
 app.use(function (req, res, next)
 {
 
-    
+
     // Website you wish to allow to connect
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
 
@@ -75,6 +75,68 @@ app.use(function (req, res, next)
 
 
 //
+//  cut the cards to see who goes first
+//
+//  sample URLs:
+//              http://localhost:8080/api/cutcards
+//
+//  returns: the two cut cards 
+//
+router.get('/cutcards/', function (req, res, next)
+{
+    let url = 'https://www.random.org/sequences/?min=0&max=51&col=1&format=plain&rnd=new';
+
+    var respObj = {};
+
+    let ret = request(url, function (error, response, body)
+    {
+        var nums = body.split('\n');
+        let i = 0;
+        while (nums[i] === nums[i + 1])
+        {
+            
+            i += 2;
+        }
+        console.log ("cutcards index: %s", i);
+        let ret = cutCards(nums.splice(i, 2), true, req, res, next);
+        return res.send(JSON.stringify(ret));
+
+    });
+
+});
+
+//
+//  cut the cards to see who goes first - pass in the random numbers that you get the same result
+//  the last time the api was called. useful for testing.
+//
+//  sample URLs:
+//              http://localhost:8080/api/cutcards/31,3
+//
+//  returns: the two cut cards 
+//
+router.get('/cutcards/:sequence', function (req, res, next)
+{
+    let nums = req.params.sequence.split(",");
+    let ret = cutCards(nums, false, req, res, next);
+    return res.send(JSON.stringify(ret));
+});
+
+function cutCards(nums, addSequenceToUrl, req, res, next)
+{
+    let url = "http://" + req.hostname + ":" + req.connection.localPort + req.originalUrl;
+    if (addSequenceToUrl)
+    {
+        url += "/" + nums.toString();
+    }
+   
+    var card1 = cards.Deck[cards.CardNames[nums[0]]]
+    var card2 = cards.Deck[cards.CardNames[nums[1]]]   
+  
+    let cutCardsObj ={CutCards: { Player: card1, Computer: card2, RepeatUrl: url}};
+    return cutCardsObj;
+}
+
+//
 //  score the hand (or crib)
 //
 //  sample URLs:
@@ -84,6 +146,7 @@ app.use(function (req, res, next)
 //              localhost:8080/api/scorehand/FiveOfHearts,SixOfHearts,SevenOfHearts,EightOfHearts/NineOfHearts/true     (should be a flush)
 //              localhost:8080/api/scorehand/FiveOfHearts,SixOfHearts,FourOfHearts,FourOFClubs/SixOfDiamonds/true     (bad card)
 //              localhost:8080/api/scorehand/FiveOfHearts,SixOfHearts,FourOfHearts,FourOfClubs/SixOfDiamonds/true     (double double run with 15s - 24 points)
+//              http://localhost:8080/api/scorehand/ThreeOfSpades,TwoOfSpades,QueenOfHearts,QueenOfClubs/AceOfHearts/false
 //
 router.get('/scorehand/:hand/:sharedcard/:isCrib', function (req, res, next)
 {
@@ -161,6 +224,7 @@ function parseCards(handAsString, res)
 //
 //  URL example:
 //                 localhost:8080/api/getnextcountedcard/AceOfSpades,AceOfHearts,TwoOfClubs,TenOfDiamonds/0
+//                 http://localhost:8080/api/getnextcountedcard/FiveOfClubs,QueenOfDiamonds/25/ThreeOfDiamonds,TenOfClubs,TwoOfSpades,QueenOfSpades
 //
 //  Note that the last parameters contains all the cards that have already been counted, which means it starts empty, so there are two routes.
 //  I trim spaces, but Cards must be spelled correctly
@@ -180,7 +244,7 @@ router.get('/getnextcountedcard/:cardsleft/:currentCount', function (req, res, n
     }
     var currentCount = Number(req.params.currentCount);
     var ret = SelectCards.selectCountedCard(countedCards, cardsLeft, currentCount);
-    res.send(ret);
+    res.send({ countedCard: ret, Scoring: { Score: 0, ScoreInfo: [] } });
 });
 //
 //  URL examples:
@@ -211,9 +275,9 @@ router.get('/getnextcountedcard/:cardsleft/:currentCount/:countedcards', functio
     var currentCount = Number(req.params.currentCount);
     var ret = SelectCards.selectCountedCard(countedCards, cardsLeft, currentCount);
 
-    var standardResponse = scoring.scoreCountingCardsPlayed(countedCards, ret, currentCount + ret.Value);
+    var standardResponse = scoring.scoreCountingCardsPlayed(countedCards, ret, currentCount);
 
-    res.send({countedCard: ret, Scoring: standardResponse});
+    res.send({ countedCard: ret, Scoring: standardResponse });
 
 });
 
@@ -295,39 +359,66 @@ router.get('/getrandomhand/:isComputerCrib', function (req, res, next)
     request(url, function (error, response, body)
     {
         var nums = body.split('\n');
-        var randomCards = [];
-        var isComputerCrib = JSON.parse(req.params.isComputerCrib);
-        let me = "player"; 
-        let you = "computer";
-        if (isComputerCrib)
-        {
-            me = "computer";
-            you = "player";
-        }
-        let hand = [];
-        for (let i = 0; i < 12; i += 2)
-        {
-            let card = cards.Deck[cards.CardNames[nums[i]]];
-            let clientCard = new cards.ClientCard(card, you);            
-            randomCards.unshift(clientCard);
-            card = cards.Deck[cards.CardNames[nums[i + 1]]];
-            clientCard = new cards.ClientCard(card, me); 
-            hand.push(card);
-            randomCards.unshift(clientCard);
+        let ret = getRandomHand(nums.splice(0, 13), true, JSON.parse(req.params.isComputerCrib), req, res, next);
+        return res.send(JSON.stringify(ret));
 
-        }
-        let card = cards.Deck[cards.CardNames[nums[12]]];
-        let sharedCard = new cards.ClientCard(card, "shared");     
-        randomCards.unshift(sharedCard);
-
-        let cribCards = SelectCards.selectCribCards(hand, isComputerCrib);
-
-
-        res.send(JSON.stringify({ RandomCards: randomCards, ComputerCribCards: cribCards, SharedCard: sharedCard, HisNibs: card.Ordinal.key === "Jack" ? true : false}));
     });
 
 
 });
+//
+//
+//  this passes back in a sequence that was probably returned by the other getrandomhand call so we 
+//  can have repeatable results and debug when a hand is returned wrong.
+//  
+//
+//  URL examples:
+//                 localhost:8080/api/getrandomhand/true/46,17,10,35,43,44,1,38,14,3,7,50,19,15,2,48,8,25,13,6,42,40,27,28,21,36,33,26,51,16,32,9,12,4,45,37,30,49,47,34,5,20,11,22,0,39,18,24,29,41,23,31,
+//
+router.get('/getrandomhand/:isComputerCrib/:sequence', (req, res, next) =>
+{
+    let nums = req.params.sequence.split(",");
+    let ret = getRandomHand(nums, false, JSON.parse(req.params.isComputerCrib), req, res, next);
+    return res.send(JSON.stringify(ret));
+});
+
+function getRandomHand(nums, addSequence, isComputerCrib, req, res, next)
+{
+    var randomCards = [];
+    let me = "player";  // from the perspective of the dealer
+    let you = "computer";
+    if (isComputerCrib)
+    {
+        me = "computer";
+        you = "player";
+    }
+    let computerHand = [];
+    for (let i = 0; i < 12; i += 2)
+    {
+        let youCard = cards.Deck[cards.CardNames[nums[i]]];     // get the random card     
+        youCard.Owner = you;
+        randomCards.unshift(youCard);                        // put it in the list of all cards at the 0th position
+        let meCard = cards.Deck[cards.CardNames[nums[i + 1]]];  // the next one belongs to the other player, get the random card from the deck             
+        meCard.Owner = me;
+        randomCards.unshift(meCard);
+
+        computerHand.push(isComputerCrib ? meCard : youCard); // need this hand to get the crib cards for the client
+
+    }
+    let card = cards.Deck[cards.CardNames[nums[12]]];
+    let sharedCard = card;
+    sharedCard.Owner = "shared";
+    randomCards.unshift(sharedCard);
+    let cribCards = SelectCards.selectCribCards(computerHand, isComputerCrib);
+    let url = "";
+    url = "http://" + req.hostname + ":" + req.connection.localPort + req.originalUrl;
+    if (addSequence)
+    {
+        url += "/" + nums.map(n => n).toString();
+    }
+    return { RandomCards: randomCards, ComputerCribCards: cribCards, SharedCard: sharedCard, HisNobs: card.Ordinal === 11 ? true : false, RepeatUrl: url };
+
+}
 
 app.use('/api', router);
 app.listen(port);
