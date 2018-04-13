@@ -136,7 +136,9 @@ function cutCards(nums, addSequenceToUrl, req, res, next)
 {
     let url = "http://" + req.hostname;
     if (req.connection.localPort != null)
-        url += ":" + req.connection.localPort + req.originalUrl;
+        url += ":" + req.connection.localPort;
+
+    url += req.originalUrl;
     if (addSequenceToUrl)
     {
         url += "/" + nums.toString();
@@ -426,7 +428,9 @@ function getRandomHand(nums, addSequence, isComputerCrib, req, res, next)
     let url = "";
     url = "http://" + req.hostname;
     if (req.connection.localPort != null)
-        url += ":" + req.connection.localPort + req.originalUrl;
+        url += ":" + req.connection.localPort;
+
+    url += req.originalUrl;
     if (addSequence)
     {
         url += "/" + nums.map(n => n).toString();
