@@ -56,13 +56,13 @@ router.get('/card/:name', function (req, res)
 app.use(function (req, res, next)
 {
 
- /*
-    addAllowHeaders(res, 'http://localhost:3000');
-    addAllowHeaders(res, 'https://cribbageui.azurewebsites.net');
- */
-   
- 
- // Pass to next layer of middleware
+    /*
+       addAllowHeaders(res, 'http://localhost:3000');
+       addAllowHeaders(res, 'https://cribbageui.azurewebsites.net');
+    */
+
+
+    // Pass to next layer of middleware
     next();
 });
 
@@ -105,10 +105,10 @@ router.get('/cutcards/', function (req, res, next)
         let i = 0;
         while (nums[i] === nums[i + 1])
         {
-            
+
             i += 2;
         }
-        console.log ("cutcards index: %s", i);
+        console.log("cutcards index: %s", i);
         let ret = cutCards(nums.splice(i, 2), true, req, res, next);
         return res.send(JSON.stringify(ret));
 
@@ -134,16 +134,18 @@ router.get('/cutcards/:sequence', function (req, res, next)
 
 function cutCards(nums, addSequenceToUrl, req, res, next)
 {
-    let url = "http://" + req.hostname + ":" + req.connection.localPort + req.originalUrl;
+    let url = "http://" + req.hostname;
+    if (req.connection.localPort != null)
+        url += ":" + req.connection.localPort + req.originalUrl;
     if (addSequenceToUrl)
     {
         url += "/" + nums.toString();
     }
-   
+
     var card1 = cards.Deck[cards.CardNames[nums[0]]]
-    var card2 = cards.Deck[cards.CardNames[nums[1]]]   
-  
-    let cutCardsObj ={CutCards: { Player: card1, Computer: card2, RepeatUrl: url}};
+    var card2 = cards.Deck[cards.CardNames[nums[1]]]
+
+    let cutCardsObj = { CutCards: { Player: card1, Computer: card2, RepeatUrl: url } };
     return cutCardsObj;
 }
 
@@ -422,7 +424,9 @@ function getRandomHand(nums, addSequence, isComputerCrib, req, res, next)
     randomCards.unshift(sharedCard);
     let cribCards = SelectCards.selectCribCards(computerHand, isComputerCrib);
     let url = "";
-    url = "http://" + req.hostname + ":" + req.connection.localPort + req.originalUrl;
+    url = "http://" + req.hostname;
+    if (req.connection.localPort != null)
+        url += ":" + req.connection.localPort + req.originalUrl;
     if (addSequence)
     {
         url += "/" + nums.map(n => n).toString();
