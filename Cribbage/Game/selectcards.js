@@ -39,14 +39,14 @@ function selectCribCards(hand, isMyCrib)
         {
             expectedValue = CardScoring.getCardValueToMyCrib(crib[0].Rank - 1, crib[1].Rank - 1);
             if (crib[0].Suit.value === crib[1].Suit.value) expectedValue += .01;
-            console.log ("crib: %s\t\thand value: %s\t crib value: %s", crib.map(card => card.cardName).toString(), score, expectedValue);
+       //     console.log ("crib: %s\t\thand value: %s\t crib value: %s", crib.map(card => card.cardName).toString(), score, expectedValue);
             score = score + expectedValue;
         }
         else // subtract from my score because the other guy gets the points
         {
             expectedValue = CardScoring.getCardValueToYourCrib(crib[0].Rank - 1, crib[1].Rank - 1);            
             if (crib[0].Suit.value === crib[1].Suit.value) expectedValue += .01;
-            console.log ("crib: %s\t\thand value: %s\t crib value: %s", crib.map(card => card.cardName).toString(), score, expectedValue);
+     //       console.log ("crib: %s\t\thand value: %s\t crib value: %s", crib.map(card => card.cardName).toString(), score, expectedValue);
             score = score - expectedValue;
             
         }     
@@ -61,7 +61,7 @@ function selectCribCards(hand, isMyCrib)
         }
     }
 
-    console.log ("\nmax crib: %s\t\ttotal value: %s", maxCrib.map(card => card.cardName).toString(), maxScore);
+//    console.log ("\nmax crib: %s\t\ttotal value: %s", maxCrib.map(card => card.cardName).toString(), maxScore);
 
     return maxCrib;
 }

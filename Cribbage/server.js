@@ -6,13 +6,13 @@ var scoring = require('./Game/scoring');
 var cards = require('./Game/card');
 var SelectCards = require('./Game/selectcards');
 var request = require('request');
-
+var cors = require('cors');
 
 
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-
+app.use(cors());
 
 
 var port = process.env.port || 8080;
@@ -56,10 +56,13 @@ router.get('/card/:name', function (req, res)
 app.use(function (req, res, next)
 {
 
+ /*
     addAllowHeaders(res, 'http://localhost:3000');
     addAllowHeaders(res, 'https://cribbageui.azurewebsites.net');
-
-    // Pass to next layer of middleware
+ */
+   
+ 
+ // Pass to next layer of middleware
     next();
 });
 
